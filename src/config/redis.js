@@ -1,8 +1,21 @@
 import { createClient } from "redis";
 
-const redisClient = createClient({ url: "redis://localhost:6379" });
-redisClient.on("error", (err) => console.log(err));
+const redisClient = createClient({
+  url: "redis://redis:6379",
+  socket: {
+    reconnectStrategy: false,
+  },
+});
+redisClient.on("error", () => {});
 
-await redisClient.connect();
+let isConnected = false;
 
-export default redisClient;
+try {
+  await redisClient.connect();
+  isConnected = true;
+  console.log("Redis connected");
+} catch (error) {
+  console.log("Redis unavailable, running without cache:", error.message);
+}
+
+export { redisClient, isConnected };

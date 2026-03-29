@@ -16,10 +16,10 @@ app.use((err, req, res, next) => {
 });
 
 const runServer = () => {
-  const PORT = 8000;
-  const HOST = "localhost";
-  app.listen(PORT, HOST, () => {
-    console.log(`SERVER CONNECTED SUCCESSFULLY http://${HOST}:${PORT}`);
+  app.listen(process.env.PORT, process.env.HOST, () => {
+    console.log(
+      `SERVER CONNECTED SUCCESSFULLY http://${process.env.HOST}:${process.env.PORT}`,
+    );
   });
 };
 
