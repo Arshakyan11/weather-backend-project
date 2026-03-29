@@ -1,19 +1,39 @@
 import { createClient } from "redis";
 
 const redisClient = createClient({
-  url: "redis://redis:6379",
+  url: process.env.REDIS_URL,
   socket: {
-    reconnectStrategy: false,
+    reconnectStrategy: (retries) => {
+      if (retries >= 2) {
+        return new Error("Retry attempts exhausted");
+      }
+      return 1000;
+    },
   },
 });
-redisClient.on("error", () => {});
 
 let isConnected = false;
 
-try {
-  await redisClient.connect();
+redisClient.on("connect", () => {
   isConnected = true;
   console.log("Redis connected");
+});
+
+redisClient.on("end", () => {
+  isConnected = false;
+  console.log("Redis disconnected");
+});
+
+redisClient.on("error", (err) => {
+  if (err.code === "ECONNREFUSED") {
+    console.log("Redis is not running (connection refused)");
+  } else {
+    console.log("Redis error:", err.message);
+  }
+});
+
+try {
+  await redisClient.connect();
 } catch (error) {
   console.log("Redis unavailable, running without cache:", error.message);
 }
