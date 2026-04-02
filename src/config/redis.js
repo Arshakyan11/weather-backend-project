@@ -31,11 +31,12 @@ redisClient.on("error", (err) => {
     console.log("Redis error:", err.message);
   }
 });
-
-try {
-  await redisClient.connect();
-} catch (error) {
-  console.log("Redis unavailable, running without cache:", error.message);
-}
+export const connectRedis = async () => {
+  try {
+    await redisClient.connect();
+  } catch (error) {
+    console.log("Redis unavailable, running without cache:", error.message);
+  }
+};
 
 export { redisClient, isConnected };

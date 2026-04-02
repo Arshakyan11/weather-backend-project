@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import routes from "./src/routes/weatherRoutes.js";
+import { connectRedis } from "./src/config/redis.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -15,7 +16,8 @@ app.use((err, req, res, next) => {
     .json({ message: err.message || "Something went wrong!!!!" });
 });
 
-const runServer = () => {
+const runServer = async () => {
+  await connectRedis();
   const PORT = process.env.PORT || 8000;
   app.listen(PORT, process.env.HOST, () => {
     console.log(`SERVER CONNECTED SUCCESSFULLY http://localhost:${PORT}`);
